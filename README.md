@@ -7,21 +7,15 @@ Realtime updates across multiple tabs/devices
 Clean, Chrome-inspired UI
 Logged-out users cannot add bookmarks (clear UX hint)
 
-🛠 Tech Stack
+Challenges Faced:
 
-Next.js (App Router, TypeScript)
-Supabase
-Auth (Google OAuth)
-Postgres DB
-Realtime
-Tailwind CSS
+Supabase Realtime configuration
+Realtime updates require the target table to be added to the supabase_realtime publication.
+This setting is not enabled by default for new tables.
+The issue was resolved by explicitly enabling realtime for the bookmarks table using SQL:
 
-🔒 Security Notes
+`alter publication supabase_realtime add table bookmarks;`
 
-Row Level Security (RLS) ensures users can only access their own bookmarks
-user_id is mandatory and enforced at DB level
-Supabase anon key is safe due to RLS (no service keys in frontend)
-
-⚡ Realtime
-
-Bookmarks sync instantly across tabs using Supabase Realtime on Postgres changes (INSERT, DELETE, UPDATE).
+Auth state & data fetching timing
+Initial data fetches ran before the auth session was fully restored, resulting in empty results due to Row Level Security.
+This was resolved by binding data fetching and realtime subscriptions to the authenticated user state.
